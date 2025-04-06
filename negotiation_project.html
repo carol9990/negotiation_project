@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <title>商务谈判模拟平台</title>
+</head>
+
+<body class="bg-gray-100">
+    <!-- 登录界面 -->
+    <div id="login" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
+        <div class="bg-white p-8 rounded shadow-md">
+            <h2 class="text-2xl font-bold mb-4">登录</h2>
+            <div class="flex justify-between mb-4">
+                <button id="teacher-login-btn" class="bg-blue-500 text-white p-2 rounded">老师登录</button>
+                <button id="student-login-btn" class="bg-green-500 text-white p-2 rounded">学生登录</button>
+            </div>
+            <form id="login-form">
+                <input type="text" id="id-number" placeholder="学号/工号" class="border p-2 w-full mb-2">
+                <input type="text" id="name" placeholder="姓名" class="border p-2 w-full mb-2">
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full">登录</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 顶部导航栏 -->
+    <nav class="bg-blue-500 p-4 hidden" id="navbar">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#" class="text-white font-bold">首页</a>
+            <div class="space-x-4">
+                <a href="#" class="text-white" data-target="student-list">学生名单</a>
+                <a href="#" class="text-white" data-target="negotiation-topic">谈判主题</a>
+                <a href="#" class="text-white" data-target="group-management">分组管理</a>
+                <a href="#" class="text-white" data-target="file-management">文件管理</a>
+                <a href="#" class="text-white" data-target="chat-room">聊天室</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主体区域 -->
+    <div class="container mx-auto p-4 hidden" id="main-content">
+        <!-- 学生名单管理 -->
+        <div id="student-list" class="mb-8">
+            <h2 class="text-2xl font-bold mb-4">学生名单管理</h2>
+            <input type="file" id="student-list-file" accept=".xlsx">
+            <button id="upload-student-list" class="bg-blue-500 text-white p-2 rounded">上传学生名单</button>
+            <table id="student-table" class="mt-4 w-full border-collapse border border-gray-300 hidden">
+                <thead>
+                    <tr>
+                        <th class="border border-gray-300 p-2">学号</th>
+                        <th class="border border-gray-300 p-2">姓名</th>
+                        <th class="border border-gray-300 p-2">组别</th>
+                        <th class="border border-gray-300 p-2">操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <button id="reset-password" class="bg-yellow-500 text-white p-2 rounded mt-4 hidden">重置账号密码</button>
+        </div>
+
+        <!-- 谈判主题管理 -->
+        <div id="negotiation-topic" class="mb-8 hidden">
+            <h2 class="text-2xl font-bold mb-4">谈判主题管理</h2>
+            <input type="file" id="topic-file" accept=".doc,.docx,.pdf">
+            <button id="upload-topic" class="bg-blue-500 text-white p-2 rounded">上传谈判主题</button>
+            <div id="topic-files" class="mt-4"></div>
+        </div>
+
+        <!-- 分组管理 -->
+        <div id="group-management" class="mb-8 hidden">
+            <h2 class="text-2xl font-bold mb-4">分组管理</h2>
+            <input type="number" id="group-count" placeholder="组数" class="border p-2 w-full mb-2">
+            <button id="random-group" class="bg-blue-500 text-white p-2 rounded">随机分组</button>
+            <button id="self-group" class="bg-green-500 text-white p-2 rounded">学生自行分组</button>
+            <div id="group-list" class="mt-4"></div>
+        </div>
+
+        <!-- 文件管理 -->
+        <div id="file-management" class="mb-8 hidden">
+            <h2 class="text-2xl font-bold mb-4">文件管理</h2>
+            <input type="file" id="normal-file" accept=".doc,.docx,.pdf">
+            <button id="upload-normal-file" class="bg-blue-500 text-white p-2 rounded">上传普通文件</button>
+            <input type="file" id="confidential-file" accept=".doc,.docx,.pdf">
+            <select id="confidential-group" class="border p-2 w-full mb-2">
+                <option value="">选择组别</option>
+            </select>
+            <input type="text" id="confidential-password" placeholder="机密文件密码" class="border p-2 w-full mb-2">
+            <button id="upload-confidential-file" class="bg-red-500 text-white p-2 rounded">上传机密文件</button>
+            <div id="file-list" class="mt-4"></div>
+        </div>
+
+        <!-- 聊天室 -->
+        <div id="chat-room" class="mb-8 hidden">
+            <h2 class="text-2xl font-bold mb-4">聊天室</h2>
+            <select id="chat-group" class="border p-2 w-full mb-2">
+                <option value="">选择组别</option>
+            </select>
+            <div id="chat-messages" class="border p-4 h-64 overflow-y-auto mb-2"></div>
+            <input type="text" id="chat-input" placeholder="输入消息" class="border p-2 w-full mb-2">
+            <button id="send-message" class="bg-blue-500 text-white p-2 rounded">发送消息</button>
+        </div>
+
+        <!-- 信息提交 -->
+        <div id="info-submission" class="mb-8 hidden">
+            <h2 class="text-2xl font-bold mb-4">信息提交</h2>
+            <input type="file" id="submission-file" accept=".doc,.docx,.pdf">
+            <button id="submit-info" class="bg-blue-500 text-white p-2 rounded">提交信息</button>
+        </div>
+    </div>
+
+    <!-- 底部信息栏 -->
+    <footer class="bg-gray-200 p-4 text-center hidden" id="footer">
+        <p>版权信息：卡罗尔 | 联系方式：ruihua609@163.com</p>
+    </footer>
+
+    <script>
+        // 模拟登录
+        const login = document.getElementById('login');
+        const navbar = document.getElementById('navbar');
+        const mainContent = document.getElementById('main-content');
+        const footer = document.getElementById('footer');
+        const loginForm = document.getElementById('login-form');
+        const teacherLoginBtn = document.getElementById('teacher-login-btn');
+        const studentLoginBtn = document.getElementById('student-login-btn');
+        let isTeacher = false;
+
+        teacherLoginBtn.addEventListener('click', () => {
+            isTeacher = true;
+        });
+
+        studentLoginBtn.addEventListener('click', () => {
+            isTeacher = false;
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            login.style.display = 'none';
+            navbar.style.display = 'block';
+            mainContent.style.display = 'block';
+            footer.style.display = 'block';
+        });
+
+        // 导航栏切换
+        const navLinks = document.querySelectorAll('#navbar a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = link.dataset.target;
+                const sections = document.querySelectorAll('#main-content > div');
+                sections.forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.getElementById(target).style.display = 'block';
+            });
+        });
+
+        // 学生名单上传
+        const studentListFile = document.getElementById('student-list-file');
+        const uploadStudentList = document.getElementById('upload-student-list');
+        const studentTable = document.getElementById('student-table');
+        const resetPassword = document.getElementById('reset-password');
+
+        uploadStudentList.addEventListener('click', () => {
+            const file = studentListFile.files[0];
+            if (file) {
+                // 模拟解析 Excel 文件
+                studentTable.style.display = 'table';
+                resetPassword.style.display = 'block';
+            }
+        });
+
+        // 谈判主题上传
+        const topicFile = document.getElementById('topic-file');
+        const uploadTopic = document.getElementById('upload-topic');
+        const topicFiles = document.getElementById('topic-files');
+
+        uploadTopic.addEventListener('click', () => {
+            const file = topicFile.files[0];
+            if (file) {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(file);
+                link.textContent = file.name;
+                link.download = file.name;
+                topicFiles.appendChild(link);
+            }
+        });
+
+        // 分组管理
+        const groupCount = document.getElementById('group-count');
+        const randomGroup = document.getElementById('random-group');
+        const selfGroup = document.getElementById('self-group');
+        const groupList = document.getElementById('group-list');
+
+        randomGroup.addEventListener('click', () => {
+            const count = parseInt(groupCount.value);
+            if (count) {
+                // 模拟随机分组
+                for (let i = 1; i <= count; i++) {
+                    const group = document.createElement('div');
+                    group.textContent = `第 ${i} 组`;
+                    groupList.appendChild(group);
+                }
+            }
+        });
+
+        // 文件管理
+        const normalFile = document.getElementById('normal-file');
+        const uploadNormalFile = document.getElementById('upload-normal-file');
+        const confidentialFile = document.getElementById('confidential-file');
+        const confidentialGroup = document.getElementById('confidential-group');
+        const confidentialPassword = document.getElementById('confidential-password');
+        const uploadConfidentialFile = document.getElementById('upload-confidential-file');
+        const fileList = document.getElementById('file-list');
+
+        uploadNormalFile.addEventListener('click', () => {
+            const file = normalFile.files[0];
+            if (file) {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(file);
+                link.textContent = file.name;
+                link.download = file.name;
+                fileList.appendChild(link);
+            }
+        });
+
+        uploadConfidentialFile.addEventListener('click', () => {
+            const file = confidentialFile.files[0];
+            const group = confidentialGroup.value;
+            const password = confidentialPassword.value;
+            if (file && group && password) {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(file);
+                link.textContent = `${file.name} (组 ${group})`;
+                link.download = file.name;
+                fileList.appendChild(link);
+            }
+        });
+
+        // 聊天室
+        const chatGroup = document.getElementById('chat-group');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendMessage = document.getElementById('send-message');
+
+        sendMessage.addEventListener('click', () => {
+            const message = chatInput.value;
+            if (message) {
+                const p = document.createElement('p');
+                p.textContent = message;
+                chatMessages.appendChild(p);
+                chatInput.value = '';
+            }
+        });
+
+        // 信息提交
+        const submissionFile = document.getElementById('submission-file');
+        const submitInfo = document.getElementById('submit-info');
+
+        submitInfo.addEventListener('click', () => {
+            const file = submissionFile.files[0];
+            if (file) {
+                alert('信息提交成功');
+            }
+        });
+    </script>
+</body>
+
+</html>
+    
